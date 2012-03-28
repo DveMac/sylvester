@@ -12,15 +12,29 @@ Sylvester.Vector.Random = function(n) {
   return Sylvester.Vector.create(elements);
 };
 
+Sylvester.Vector.RandPerm = function(n, k) {
+  var elements = [], perms = [];
+  if (k === undefined || k > n) k = n;
+  while (n--) { perms.push(n+1); }
+  while (k--) { elements.push(perms.splice(Math.round(Math.random() * perms.length-1),1)[0]); }
+  return Sylvester.Vector.create(elements);
+};
+
 Sylvester.Vector.Zero = function(n) {
   var elements = [];
   while (n--) { elements.push(0); }
   return Sylvester.Vector.create(elements);
 };
 
+Sylvester.Vector.One = function(n) {
+  var elements = [];
+  while (n--) { elements.push(1); }
+  return Sylvester.Vector.create(elements);
+};
+
 Sylvester.Vector.prototype = {
-  e: function(i) {
-    return (i < 1 || i > this.elements.length) ? null : this.elements[i-1];
+  e: function(i, x) {
+    return (i < 1 || i > this.elements.length) ? null : (x === undefined ? this.elements[i-1] : (this.elements[i-1] = x));
   },
 
   dimensions: function() {
@@ -151,6 +165,16 @@ Sylvester.Vector.prototype = {
       }
     }
     return index;
+  },
+
+  indexesOf: function(iterator) {
+    var indexes = [], n = this.elements.length;
+    for (var i = 0; i < n; i++) {
+      if (iterator(this.elements[i], i)) {
+        indexes.push(i);
+      }
+    }
+    return Sylvester.Vector.create(indexes);
   },
 
   toDiagonalMatrix: function() {

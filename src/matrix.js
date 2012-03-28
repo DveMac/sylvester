@@ -81,7 +81,7 @@ Sylvester.Matrix.Random = function(n, m) {
 
 Sylvester.Matrix.Zero = function(n, m) {
   var els = [], i = n, j;
-  while (i--) { j = m;
+  while (i--) { j = (m || n);
     els[i] = [];
     while (j--) {
       els[i][j] = 0;
@@ -90,10 +90,22 @@ Sylvester.Matrix.Zero = function(n, m) {
   return Sylvester.Matrix.create(els);
 };
 
+Sylvester.Matrix.Of = function(n, m, x) {
+  var els = [], i = n, j;
+  x = x || 0;
+  while (i--) { j = (m || n);
+    els[i] = [];
+    while (j--) {
+      els[i][j] = x;
+    }
+  }
+  return Sylvester.Matrix.create(els);
+};
+
 Sylvester.Matrix.prototype = {
-  e: function(i,j) {
+  e: function(i,j,x) {
     if (i < 1 || i > this.elements.length || j < 1 || j > this.elements[0].length) { return null; }
-    return this.elements[i-1][j-1];
+    return x === undefined ? this.elements[i-1][j-1] : (this.elements[i-1][j-1] = x);
   },
 
   row: function(i) {
@@ -421,9 +433,14 @@ Sylvester.Matrix.prototype = {
     var i, j, elements = els.elements || els;
     if (elements[0] && typeof(elements[0][0]) !== 'undefined') {
       i = elements.length;
-      this.elements = [];
-      while (i--) { j = elements[i].length;
-        this.elements[i] = [];
+      if(!this.elements || i > this.elements.length) {
+        this.elements = [];
+      }
+      while (i--) {
+        j = elements[i].length;
+        if(! this.elements[i] || j > this.elements[i].length){
+          this.elements[i] = [];
+        }
         while (j--) {
           this.elements[i][j] = elements[i][j];
         }
